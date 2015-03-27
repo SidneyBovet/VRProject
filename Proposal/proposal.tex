@@ -20,6 +20,9 @@
 
 \documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
 
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
 \usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
 \usepackage[english]{babel} % English language/hyphenation
@@ -105,6 +108,22 @@ We want to use the Oculus as the head-tracking system of our project and the Lea
 \item MOZVR: \url{http://mozvr.com/}
 \item BumTop 3D Desktop: \url{https://www.youtube.com/watch?v=M0ODskdEPnQ}
 \end{enumerate}
+
+
+\begin{figure}
+\centering
+\begin{subfigure}[c]{0.4\textwidth}
+\includegraphics[width=1\textwidth]{sao.png}
+\caption{\label{fig:frog}SAO like menu}
+\end{subfigure}%
+\qquad%
+\begin{subfigure}[c]{0.4\textwidth}
+\centering
+\includegraphics[width=1\textwidth]{fs.png}
+\caption{\label{fig:frog}File system example}
+\end{subfigure}
+\end{figure}
+
 
 
 %----------------------------------------------------------------------------------------

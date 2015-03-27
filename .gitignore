@@ -1,2 +1,9 @@
 *.log
 *.swp
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.out
+*.pdf
+*.synctex.gz

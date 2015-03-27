@@ -25,8 +25,6 @@
 \usepackage[english]{babel} % English language/hyphenation
 \usepackage{amsmath,amsfonts,amsthm} % Math packages
 
-\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
-
 \usepackage{sectsty} % Allows customizing section commands
 \allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
 
@@ -76,27 +74,36 @@
 
 \section{General Idea}
 
-\lipsum[2] % Dummy text
+In the recent years, many people have released interesting applications and demos for various VR devices such as Oculus, Razer Hydra, Kinect, Leapmotion, and many more. The problem we identified is that most of these applications are either games or closer to a poof of concept than a really useful app for the user. We propose to take two of these devices, namely the Oculus and the Leapmotion sensor, and to produce a useful app that could possibly be used by people for more than five minutes. Our general idea is to create an interactive app-launcher for other Oculus applications so that the user stays during the whole interaction within the virtual environment.
 
 %------------------------------------------------
 
 \section{Work previously done}
 
-\lipsum[3] % Dummy text
+The main inspiration for this project comes from a demo made by a VR enthusiast known as HOCgaming. This video is pointed to in section \ref{sec:refs} and shows a user interface inspired by a famous anime. While being extremely interesting and very enthusing, this application suffers from the syndrome expressed above: it is enjoyable for ten minutes and then lacks usefulness.
+
+On the other hand a quite successful project in its usability is mozvr. It is an extension to Mozilla Firefox that enables the user to browse some prepared webpages using an Oculus and possibly other VR devices. It is to us a great example of what a good application can be in terms of usability and usefulness.
+
+One last work we spotted as interesting is an interactive 3D desktop application that enables the user to order a virtual desktop full of files, move them around, stack them and so on. We find this design quite intuitive and close to a real-life organisation (more realism than magic in this case).
 
 %------------------------------------------------
 
 \section{Devices and API}
+We want to use the Oculus as the head-tracking system of our project and the Leapmotion sensor as a 3D input device. 
 
-\lipsum[1] % Dummy text
+%------------------------------------------------
+
+\section{Detailed idea}
+
 
 %------------------------------------------------
 
 \section{References}
-
+\label{sec:refs}
 \begin{enumerate}
 \item Main inspiration: \url{https://www.youtube.com/watch?v=jLp3W1gbhRk&t=51}
-\item 3D File Explorer: \url{https://www.youtube.com/watch?v=7qAPSjeKlgw}
+\item MOZVR: \url{http://mozvr.com/}
+\item BumTop 3D Desktop: \url{https://www.youtube.com/watch?v=M0ODskdEPnQ}
 \end{enumerate}
 
 

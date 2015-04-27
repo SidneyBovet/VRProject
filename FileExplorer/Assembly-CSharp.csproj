@@ -46,13 +46,11 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\SixenseHand.cs" />
+     <Compile Include="Assets\Scripts\SixenseHandsController.cs" />
+     <Compile Include="Assets\Scripts\SixenseInput.cs" />
+     <Compile Include="Assets\Scripts\SixensePlugin.cs" />
      <Compile Include="Assets\Scripts\planetController.cs" />
-     <Compile Include="Assets\SixenseInput\DemoScenes\Scripts\SixenseHand.cs" />
-     <Compile Include="Assets\SixenseInput\DemoScenes\Scripts\SixenseHandsController.cs" />
-     <Compile Include="Assets\SixenseInput\DemoScenes\Scripts\SixenseInputTest.cs" />
-     <Compile Include="Assets\SixenseInput\DemoScenes\Scripts\SixenseObjectController.cs" />
-     <Compile Include="Assets\SixenseInput\Scripts\SixenseInput.cs" />
-     <Compile Include="Assets\SixenseInput\Scripts\SixensePlugin.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity5/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

@@ -9,6 +9,7 @@ public class planetController : MonoBehaviour {
 	public GameObject sunPrefab;
 	public GameObject planetPrefab;
 	public GameObject starClusterPrefab;
+	public GameObject asteroidBeltPrefab;
 	
 	public Material executable;
 	public Material text;
@@ -83,6 +84,12 @@ public class planetController : MonoBehaviour {
 		for (int i=0; i<planets.Length; i++) {
 			planets[i] = createObject(files[i].Name, planetPrefab, executable, new Vector3(0f,0f,(i+1)*(-20f)));
 		}
+
+		createObject (
+			"Asteroids",
+			asteroidBeltPrefab,
+			null,
+			new Vector3(0f, 0f, (Mathf.Max (dirs.Length, files.Length)+1)*(-20f)));
 	}
 	
 	private void removeAll() {

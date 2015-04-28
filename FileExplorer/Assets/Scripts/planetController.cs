@@ -29,7 +29,7 @@ public class planetController : MonoBehaviour {
 	private GameObject[] planets;
 	
 	Vector3 origin = Vector3.zero;
-	
+
 	void Start () {
 		loadFolder(new DirectoryInfo ("."));
 	}
@@ -110,6 +110,19 @@ public class planetController : MonoBehaviour {
 			Renderer rend = currentFile.GetComponent<Renderer> ();
 			rend.material = mat;
 		}
+
+		Transform nameObject = currentFile.transform.Find("Name");
+		if (null != nameObject) {
+			nameObject.GetComponent<TextMesh> ().text = name;
+		} else {
+			Debug.Log ("No Text child");
+		}
+
 		return currentFile;
+	}
+
+	public void DrawNames (float playerPosition) {
+		// find planets / star cluster whose name must be drawn
+
 	}
 }

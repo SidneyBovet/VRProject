@@ -3,6 +3,7 @@ using System.Collections;
 
 public class SixenseHandsController : MonoBehaviour {
 	SixenseHand[] 	m_hands;
+	UserController m_camera;
 
 	Vector3	m_baseOffset;
 	float 	m_sensitivity = 0.001f; // Sixense units are in mm
@@ -11,9 +12,17 @@ public class SixenseHandsController : MonoBehaviour {
 	
 	void Start () {
 		m_hands = GetComponentsInChildren<SixenseHand>();
+		m_camera = GetComponentInParent<UserController> ();
 	}
 
 	void Update () {
+		// DEBUG
+		if (Input.GetKey (KeyCode.DownArrow))
+			m_camera.Move (-1.0f);
+		else if (Input.GetKey (KeyCode.UpArrow))
+			m_camera.Move (1.0f);
+		// END DEBUG
+
 		bool bResetHandPosition = false;
 
 		foreach ( SixenseHand hand in m_hands ) {
@@ -70,6 +79,7 @@ public class SixenseHandsController : MonoBehaviour {
 			average /= m_hands.Length;
 			if (m_scrollAverage.HasValue) {
 				//TODO call camera with m_scrollAverage - average
+				m_camera.Move ((float)(m_scrollAverage.Value - average));
 				print ("Grab: "+ (m_scrollAverage.Value - average));
 			}
 			m_scrollAverage = average;

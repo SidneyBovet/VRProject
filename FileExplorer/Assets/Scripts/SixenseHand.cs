@@ -9,15 +9,13 @@ public class SixenseHand : MonoBehaviour
 	public float selectionDistance = 0.01f;
 	public bool	grab = false;
 
-	public delegate void SelectionCallBack();
-	public SelectionCallBack selectionCallBack;
-
 	Animator 	m_animator;
 	float 		m_fLastTriggerVal;
 	Vector3		m_initialPosition;
 	Quaternion 	m_initialRotation;
 	private Vector3? m_pointPos = null;
 	private float m_selectionDistance = 0f;
+	Transform m_sceneController = transform.Find("controller");
 
 	protected void Start() {
 		m_animator = gameObject.GetComponent<Animator>();
@@ -60,10 +58,8 @@ public class SixenseHand : MonoBehaviour
 			if(m_pointPos.HasValue && (transform.localPosition - m_pointPos.Value).magnitude > minSelectionSpeed * Time.deltaTime) {
 				m_selectionDistance += (transform.localPosition - m_pointPos.Value).magnitude;
 				if(m_selectionDistance > selectionDistance) {
-					Debug.Log ("Selection from a hand.");
 
-					if (selectionCallBack != null)
-						selectionCallBack();
+					m_sceneController.GetComponent<PlanetController>().Selection();
 
 					m_selectionDistance = 0f;
 				}

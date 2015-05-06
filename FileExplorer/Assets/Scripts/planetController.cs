@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 
-public class planetController : MonoBehaviour {
+public class PlanetController : MonoBehaviour {
 	
 	public GameObject sunPrefab;
 	public GameObject planetPrefab;
@@ -136,5 +136,10 @@ public class planetController : MonoBehaviour {
 	public void DrawNames (float playerPosition) {
 		// find planets / star cluster whose name must be drawn
 
+	}
+
+	public void Selection() {
+		Collider selected = transform.Find ("controller").GetComponent<UserController>().GetSelection;
+		// TODO displaz file or cd to folder
 	}
 }

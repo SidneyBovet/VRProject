@@ -83,6 +83,14 @@ public class planetController : MonoBehaviour {
 		}
 		for (int i=0; i<planets.Length; i++) {
 			planets[i] = createObject(files[i].Name, planetPrefab, executable, new Vector3(0f,0f,(i+1)*(-20f)));
+
+			float randomAngleX = UnityEngine.Random.Range(-0.5f,0.5f);
+			float randomAngleZ = UnityEngine.Random.Range(-0.5f,0.5f);
+			Vector3 upVector = new Vector3(Mathf.Cos(randomAngleX),1.0f,Mathf.Cos (randomAngleZ));
+			planets[i].transform.rotation = Quaternion.LookRotation(Vector3.Cross(transform.up,upVector),upVector);
+			
+			float randomAngular = UnityEngine.Random.Range(-1.0f,1.0f);
+			planets[i].transform.GetComponent<Rigidbody>().angularVelocity = randomAngular * upVector;
 		}
 
 		createObject (

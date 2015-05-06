@@ -18,9 +18,11 @@ public class SixenseHandsController : MonoBehaviour {
 	void Update () {
 		// DEBUG
 		if (Input.GetKey (KeyCode.DownArrow))
-			m_camera.Move (-1.0f);
+			m_camera.Move (-0.2f);
 		else if (Input.GetKey (KeyCode.UpArrow))
-			m_camera.Move (1.0f);
+			m_camera.Move (0.2f);
+		else if (Input.GetKey (KeyCode.Space))
+			m_camera.Move (0.0f);
 		// END DEBUG
 
 		bool bResetHandPosition = false;

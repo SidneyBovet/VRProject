@@ -89,7 +89,7 @@ public class planetController : MonoBehaviour {
 			"Asteroids",
 			asteroidBeltPrefab,
 			null,
-			new Vector3(0f, 0f, (Mathf.Max (dirs.Length, files.Length)+1)*(-20f)));
+			new Vector3(0f, 2f, (Mathf.Max (dirs.Length, files.Length)+1)*(-20f)));
 	}
 	
 	private void removeAll() {
@@ -115,7 +115,7 @@ public class planetController : MonoBehaviour {
 		if (null != nameObject) {
 			nameObject.GetComponent<TextMesh> ().text = name;
 		} else {
-			Debug.Log ("No Text child");
+			Debug.Log ("No Text child for object " + name);
 		}
 
 		return currentFile;

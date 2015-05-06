@@ -31,10 +31,11 @@ public class SixenseHandsController : MonoBehaviour {
 			}
 
 			if ( m_bInitialized ) {
+				Grab ();
 				UpdateHand( hand );
 			}
 		}
-				
+
 		if ( bResetHandPosition ) {
 			m_bInitialized = true;
 
@@ -44,7 +45,6 @@ public class SixenseHandsController : MonoBehaviour {
 			foreach ( SixenseHand hand in m_hands ) {
 				m_baseOffset += hand.m_controller.Position;
 			}
-			Grab();
 
 			m_baseOffset /= 2;
 		}
@@ -78,9 +78,7 @@ public class SixenseHandsController : MonoBehaviour {
 		if (scrolling) {
 			average /= m_hands.Length;
 			if (m_scrollAverage.HasValue) {
-				//TODO call camera with m_scrollAverage - average
 				m_camera.Move ((float)(m_scrollAverage.Value - average));
-				print ("Grab: "+ (m_scrollAverage.Value - average));
 			}
 			m_scrollAverage = average;
 		} else {

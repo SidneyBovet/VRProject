@@ -15,9 +15,10 @@ public class SixenseHand : MonoBehaviour
 	Quaternion 	m_initialRotation;
 	private Vector3? m_pointPos = null;
 	private float m_selectionDistance = 0f;
-	Transform m_sceneController = transform.Find("controller");
+	Transform m_sceneController;
 
 	protected void Start() {
+		m_sceneController = transform.Find("controller");
 		m_animator = gameObject.GetComponent<Animator>();
 		m_initialRotation = transform.localRotation;
 		m_initialPosition = transform.localPosition;

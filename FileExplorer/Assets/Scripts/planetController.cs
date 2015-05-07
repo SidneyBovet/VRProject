@@ -139,7 +139,7 @@ public class PlanetController : MonoBehaviour {
 	}
 
 	public void Selection() {
-		Collider selected = transform.Find ("controller").GetComponent<UserController>().GetSelection;
+		Collider selected = transform.Find ("controller").GetComponent<UserController>().GetSelection();
 		// TODO displaz file or cd to folder
 	}
 }

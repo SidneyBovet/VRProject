@@ -82,13 +82,60 @@ public class PlanetController : MonoBehaviour {
 			startClusters[i] = createObject(dirs[i].Name, starClusterPrefab, null, new Vector3(3f,0f,(i+1)*(-30f)));
 		}
 		for (int i=0; i<planets.Length; i++) {
-			planets[i] = createObject(files[i].Name, planetPrefab, executable, new Vector3(0f,0f,(i+1)*(-20f)));
+			// determine the material to be used
+			Material planetMat = null;
+			string[] extention = files[i].Name.Split(new Char[] {'.'});
+			switch (extention[extention.Length-1]) {
+			case "exe":
+				planetMat = executable;
+				break;
+			case "txt":
+				planetMat = text;
+				break;
+			case "cs":
+				planetMat = text;
+				break;
+			case "jpg":
+				planetMat = image;
+				break;
+			case "png":
+				planetMat = image;
+				break;
+			case "tga":
+				planetMat = image;
+				break;
+			case "avi":
+				planetMat = video;
+				break;
+			case "mp3":
+				planetMat = music;
+				break;
+			case "odf":
+				planetMat = document;
+				break;
+			case "doc":
+				planetMat = document;
+				break;
+			case "docx":
+				planetMat = document;
+				break;
+			case "obj":
+				planetMat = model3D;
+				break;
+			default:
+				planetMat = other;
+				break;
+			}
 
+			planets[i] = createObject(files[i].Name, planetPrefab, planetMat, new Vector3(0f,0f,(i+1)*(-20f)));
+
+			// set a random axis tilt
 			float randomAngleX = UnityEngine.Random.Range(-0.5f,0.5f);
 			float randomAngleZ = UnityEngine.Random.Range(-0.5f,0.5f);
 			Vector3 upVector = new Vector3(Mathf.Cos(randomAngleX),1.0f,Mathf.Cos (randomAngleZ));
 			planets[i].transform.FindChild("Planet").transform.rotation = Quaternion.LookRotation(Vector3.Cross(transform.up,upVector),upVector);
-			
+
+			// set a random angular speed
 			float randomAngular = UnityEngine.Random.Range(-0.5f,0.5f);
 			planets[i].transform.FindChild("Planet").GetComponent<Rigidbody>().angularVelocity = randomAngular * upVector;
 		}

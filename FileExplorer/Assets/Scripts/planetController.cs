@@ -19,7 +19,20 @@ public class PlanetController : MonoBehaviour {
 	public Material document;
 	public Material model3D;
 	public Material other;
-	
+
+	public GameObject textfileContentPrefab;
+
+	private enum FileType {
+		Executable,
+		Text,
+		Image,
+		Video,
+		Music,
+		Document,
+		Model3D,
+		Other
+	}
+
 	private DirectoryInfo dir;
 	private DirectoryInfo[] dirs;
 	private FileInfo[] files;
@@ -27,6 +40,8 @@ public class PlanetController : MonoBehaviour {
 	private GameObject sun;
 	private GameObject[] startClusters;
 	private GameObject[] planets;
+
+	private bool canSelect = true;
 	
 	Vector3 origin = Vector3.zero;
 
@@ -186,7 +201,50 @@ public class PlanetController : MonoBehaviour {
 	}
 
 	public void Selection() {
-		Collider selected = transform.Find ("controller").GetComponent<UserController>().GetSelection();
+		Collider selected = transform.Find ("/OVRPlayerController").GetComponent<UserController>().GetSelection();
 		// TODO displaz file or cd to folder
+
+		if (canSelect && selected != null && selected.CompareTag ("File")) {
+			canSelect = false;
+			string[] extention = selected.transform.parent.name.Split (new Char[] {'.'});
+			Debug.Log (extention [extention.Length - 1]);
+			switch (extention [extention.Length - 1]) {
+			case "txt":
+				Debug.Log ("TextFile selected!");
+				StartCoroutine (DisplayFile (FileType.Text, selected.transform.parent));
+				break;
+			default:
+				Debug.Log ("Unknown filetype selected!");
+				StartCoroutine (DisplayFile (FileType.Other, selected.transform.parent));
+				break;
+			}
+		}
+	}
+
+	IEnumerator DisplayFile(FileType type, Transform file) {
+		switch (type) {
+		case FileType.Text:
+			for (int i = 0; i < 10; i++) {
+				file.Translate(new Vector3(0f,0.2f,0f));
+				yield return new WaitForSeconds(0.05f);
+			}
+			GameObject content = GameObject.Instantiate(
+				textfileContentPrefab, 
+				textfileContentPrefab.transform.position + new Vector3(0f,file.position.y + 0.5f,file.position.z),
+				Quaternion.identity) as GameObject;
+			content.GetComponent<TextMesh>().text = "TODO: get textfile content\nand use it to feed this\nGameObject, insering linefeeds\nif necessary.";
+			break;
+		case FileType.Other:
+			for (int i = 0; i < 5; i++) {
+				file.Translate(new Vector3(0f,0.1f,0f));
+				yield return new WaitForSeconds(0.01f);
+			}
+			for (int i = 0; i < 5; i++) {
+				file.Translate(new Vector3(0f,-0.1f,0f));
+				yield return new WaitForSeconds(0.01f);
+			}
+			break;
+		}
+		canSelect = true;
 	}
 }

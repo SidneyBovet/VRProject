@@ -18,7 +18,7 @@ public class SixenseHand : MonoBehaviour
 	Transform m_sceneController;
 
 	protected void Start() {
-		m_sceneController = transform.Find("controller");
+		m_sceneController = transform.Find("/controller");
 		m_animator = gameObject.GetComponent<Animator>();
 		m_initialRotation = transform.localRotation;
 		m_initialPosition = transform.localPosition;

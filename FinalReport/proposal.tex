@@ -20,7 +20,7 @@
 
 \documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
 
-\usepackage{graphicx}
+\usepackage{graphicx, float}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
@@ -59,7 +59,7 @@
 	\normalfont \normalsize
 	\textsc{EPFL CS-444 Virtual Reality} \\ [25pt] % Your university, school and/or department name(s)
 	\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
-	\huge File Explorer in Outer Space \\ % The assignment title
+	\huge File Explorer in Outer Space - FEOS \\ % The assignment title
 	\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
 }
 
@@ -72,10 +72,46 @@
 \maketitle % Print the title
 
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{cover}
+\end{figure}
+
 % The report is meant to inform the structure/architecture of your project and instruct on how to configure and run it.
 
 
 \section{Project presentation \& User experience}
+
+
+This project aimed to build a 3D file explorer to have an entertaining yet useful VR experience. The base idea is to have all folders represented by solar systems. All files within that folder are planets, whose texture changes according to the file type itself. Figure \ref{fig:general} show a general example of the left eye of the user's view.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{base-idea}
+	\caption{A general screenshot of the file explorer's scenario and GUI.}
+	\label{fig:general}
+\end{figure}
+
+Immersion in the VE is provided by two devices: a HMD and a Razer Hydra. The former provides a 360-degree field of regard as opposed to other webcam-based head tracking solutions, while the latter gives 6 DOF, occlusion-resistant hand tracking. By coupling the Razor hydra with virtual hands animated according to some trigger buttons pressed, one can feel quite a good sense of Agency given some training. For instance, the user can grab the air using both bottommost triggers to pull and push herself along the axis on which the planets appear. An asteroid belt is used to show the user that the end of the folder has been reached.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{asteroids}
+	\caption{The asteroid belt at the end of the folder.}
+	\label{fig:asteroids}
+\end{figure}
+
+Selection is achieved through regard: the last item that have crossed the centre of the screen if selected (i.e. simple click on a regular file explorer), and one can activate that selection (i.e. double-click) by pressing the topmost trigger and having a swift move towards the desired item.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{text-display}
+	\caption{How a text file is displayed in the VE.}
+	\label{fig:textfile}
+\end{figure}
+
+Upon activation (i.e. double-click) a file will either show its content if it is supported (as shown in Figure \ref{fig:textfile} for a text file) or bump to show a negative feedback due to unsupported extension. A folder will trigger a solar system change and the user then can browse that folder.
+
 - How the interaction loop works? What the user sees and how the application behaves with respect to his/her input.
 
 - Relevant screenshot(s) (and/or photos showing the user playing) of the program running
@@ -85,9 +121,9 @@
 \section{Libraries, resources and algorithms used}
 The virtual environment was built using Unity.
 
-The project uses the Oculus integration plugin for displaying the VE and to achieve head tracking. A modified version of the Hydra framework provided by Razer is used for the tracking of the markers. Full use is made of the various C\# libraries provided by Unity including utilities, math, etc.
+The project uses the Oculus integration plugin for displaying the VE and to achieve head tracking. A modified version of the Hydra framework provided by Razer is used for the tracking of the markers. Full use is made of the various C\# libraries provided by Unity including utilities, math, random, etc.
 
-The physic simulation and particle systems generation mechanisms are those of Unity.
+The physic simulation and particle systems generation mechanisms are those of Unity. For instance the asteroid belt mentioned above is shattered by interacting with the user using Unity's built-in rigid bodies and mesh colliders.
 
 %------------------------------------------------
 	
@@ -123,14 +159,6 @@ The physic simulation and particle systems generation mechanisms are those of Un
 During this project we learned a lot of thing regarding the field of VR itself and more generally concerning this kind of creative projects. Given the time this project was supposed to take we had to leave aside lots of improvements we discussed along the path, such as being able to launch executable applications, display images and videos, and so on. On the other hand we believe our code is ready to house these features since we made it in a clear and modulated fashion.
 
 What was good about this project was not to have to stumble upon OpenGL issues and really being able to focus on the VR side of the project. On the other hand it was unclear how much time, effort and quality was expected, which has led us to quite a large workload.
-
-%------------------------------------------------
-
-\section{References}
-\label{sec:refs}
-\begin{enumerate}
-\item ref 1: \url{https://www.youtube.com/watch?v=jLp3W1gbhRk&t=51}
-\end{enumerate}
 
 %----------------------------------------------------------------------------------------
 

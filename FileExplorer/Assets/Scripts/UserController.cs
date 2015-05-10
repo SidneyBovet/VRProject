@@ -8,6 +8,11 @@ public class UserController : MonoBehaviour {
 	private bool m_canMove = true;
 	private float m_moveSensitivity = 150000.0f;
 	private Collider m_selection = null;
+	private Vector3 defaultPos;
+
+	void Start() {
+		defaultPos = transform.position;
+	}
 
 	void Update () {
 		Transform forward = transform.FindChild ("OVRCameraRig/TrackingSpace/CenterEyeAnchor");
@@ -21,6 +26,11 @@ public class UserController : MonoBehaviour {
 					((Behaviour)(m_selection.GetComponent("Halo"))).enabled = false;
 				m_selection = hit.collider;
 			}
+		}
+		
+		if (Input.GetKeyDown (KeyCode.R)) {
+			transform.position = defaultPos;
+			GetComponent<Rigidbody>().velocity = Vector3.zero;
 		}
 	}
 

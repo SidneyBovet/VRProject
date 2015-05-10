@@ -5,12 +5,14 @@ using System;
 using System.IO;
 
 public class PlanetController : MonoBehaviour {
-	
+
+	//prefabs to represent a solar system
 	public GameObject sunPrefab;
 	public GameObject planetPrefab;
 	public GameObject starClusterPrefab;
 	public GameObject asteroidBeltPrefab;
-	
+
+	//different material for planets to represent different file type
 	public Material executable;
 	public Material text;
 	public Material image;
@@ -21,8 +23,9 @@ public class PlanetController : MonoBehaviour {
 	public Material other;
 	public GameObject textfileContentPrefab;
 
-	public float planetWindowSize = 4f;
-	public float maxPlanetDiffPos = 0.5f;
+	//parameter that change the randomisation of planets position
+	public float planetWindowSize = 10f;
+	public float maxPlanetDiffPos = 5f;
 	
 	private bool canSelect = true;
 	private bool fileSelected = false;
@@ -45,6 +48,10 @@ public class PlanetController : MonoBehaviour {
 	}
 
 	void Update() {
+		/*
+		 * Always keep the current solar system (systems[0]) at the origin
+		 * Do a cool Lerp to get a smoth transition between the new and the old solar system
+		 */
 		if (systems [0] != null && systems [1] != null && systems [0].origin.magnitude > 0.1f) {
 			float speed = Mathf.Max(0.001f, 1-systems[0].origin.magnitude/posInit.magnitude);
 			Vector3 move = Vector3.Lerp(Vector3.zero, systems [0].origin, speed*0.1f);
@@ -56,6 +63,11 @@ public class PlanetController : MonoBehaviour {
 		}
 	}
 
+	/*
+	 * Is called when the user have selected a folder or a file
+	 * If it is a file display it (if possible)
+	 * If it is a folder load the new solar system
+	 */
 	public void Selection() {
 		Collider selected = transform.Find ("/OVRPlayerController").GetComponent<UserController>().GetSelection();
 		if (!canSelect || selected == null)
@@ -84,7 +96,10 @@ public class PlanetController : MonoBehaviour {
 			changeSolarSystem(selected.gameObject, posInit);
 		}
 	}
-	
+
+	/*
+	 * This method load a new solar system and get ride of the old one (change folder)
+	 */
 	private bool changeSolarSystem(GameObject newSystem, Vector3 origin) {
 		DirectoryInfo newDir = null;
 		
@@ -106,7 +121,10 @@ public class PlanetController : MonoBehaviour {
 		systems[0] = new SolarSystem (this, newDir, origin);
 		return true;
 	}
-	
+
+	/*
+	 * This method is responsible to display the file contant
+	 */
 	IEnumerator DisplayFile(FileType type, Transform file) {
 		switch (type) {
 		case FileType.Text:
@@ -165,7 +183,9 @@ public class PlanetController : MonoBehaviour {
 	}
 	
 	
-	
+	/*
+	 * This inner calass represent a solar system in other words a folder and its contant.
+	 */
 	private class SolarSystem {
 		public DirectoryInfo dir;
 		public DirectoryInfo[] dirs;
@@ -184,7 +204,10 @@ public class PlanetController : MonoBehaviour {
 			this.origin = origin;
 			loadFolder(dir);
 		}
-		
+
+		/*
+		 * Move the system to the new origin
+		 */
 		public void setOrigin(Vector3 origin) {
 			sun.transform.position = sun.transform.position - this.origin + origin;
 			
@@ -198,7 +221,10 @@ public class PlanetController : MonoBehaviour {
 			
 			this.origin = origin;
 		}
-		
+
+		/*
+		 * create the system from the contant of dir in argument
+		 */
 		private void loadFolder(DirectoryInfo dir) {
 			this.dir = dir;
 			dirs =  dir.GetDirectories();
@@ -245,7 +271,10 @@ public class PlanetController : MonoBehaviour {
 			asteroids = createObject ("Asteroids", pc.asteroidBeltPrefab, null,
 				new Vector3(0f, 2f, (Mathf.Max (dirs.Length, files.Length)+1)*(-20f)));
 		}
-		
+
+		/*
+		 * Remove all objects from this system from the scene
+		 */
 		public void removeAll() {
 			Destroy (sun);
 			foreach (GameObject startCluster in startClusters) {
@@ -255,11 +284,6 @@ public class PlanetController : MonoBehaviour {
 				Destroy (planet);
 			}
 			Destroy (asteroids);
-		}
-			
-		public void DrawNames (float playerPosition) {
-			// find planets / star cluster whose name must be drawn
-			
 		}
 		
 		private GameObject createObject(String name, GameObject prefab, Material mat, Vector3 pos) {

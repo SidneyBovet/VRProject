@@ -42,7 +42,8 @@ public class PlanetController : MonoBehaviour {
 
 	void Update() {
 		if (systems [0] != null && systems [1] != null && systems [0].origin.magnitude > 0.1f) {
-			Vector3 move = Vector3.Lerp(posInit, Vector3.zero, 0.1f);
+			float speed = Mathf.Max(0.001f, 1-systems[0].origin.magnitude/posInit.magnitude);
+			Vector3 move = Vector3.Lerp(Vector3.zero, systems [0].origin, speed*0.1f);
 			systems [0].setOrigin (systems [0].origin - move);
 			systems [1].setOrigin (systems [1].origin - move);
 		} else {

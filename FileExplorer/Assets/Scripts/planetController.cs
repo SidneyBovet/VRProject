@@ -19,9 +19,11 @@ public class PlanetController : MonoBehaviour {
 	public Material document;
 	public Material model3D;
 	public Material other;
-
 	public GameObject textfileContentPrefab;
-
+	
+	private bool canSelect = true;
+	private SolarSystem[] systems;
+	private Vector3 posInit = new Vector3(1000f, 0f, 0f);
 	private enum FileType {
 		Executable,
 		Text,
@@ -32,179 +34,28 @@ public class PlanetController : MonoBehaviour {
 		Model3D,
 		Other
 	}
-
-	private DirectoryInfo dir;
-	private DirectoryInfo[] dirs;
-	private FileInfo[] files;
 	
-	private GameObject sun;
-	private GameObject[] startClusters;
-	private GameObject[] planets;
-
-	private bool canSelect = true;
-	
-	Vector3 origin = Vector3.zero;
-
 	void Start () {
-		loadFolder(new DirectoryInfo ("."));
+		systems = new SolarSystem[2];
+		systems[0] = new SolarSystem (this, new DirectoryInfo ("."), Vector3.zero);
 	}
-	
-	public void setOrigin(Vector3 origin) {
-		sun.transform.position = sun.transform.position - this.origin + origin;
-		
-		foreach (GameObject startCluster in startClusters) {
-			startCluster.transform.position = startCluster.transform.position - this.origin + origin;
-		}
-		foreach (GameObject planet in planets) {
-			planet.transform.position = planet.transform.position - this.origin + origin;
-		}
-		
-		this.origin = origin;
-	}
-	
-	public bool changeSolarSystem(GameObject newSystem) {
-		DirectoryInfo newDir = null;
-		if(newSystem == sun) {
-			newDir = dir.Parent;
+
+	void Update() {
+		if (systems [0] != null && systems [1] != null && systems [0].origin.magnitude > 0.1f) {
+			Vector3 move = Vector3.Lerp(posInit, Vector3.zero, 0.1f);
+			systems [0].setOrigin (systems [0].origin - move);
+			systems [1].setOrigin (systems [1].origin - move);
 		} else {
-			for (int i=0; i<startClusters.Length; i++) {
-				if(newSystem == startClusters[i]) {
-					newDir = dirs[i];
-					break;
-				}
-			}
+			canSelect = true;
 		}
-		if(newDir == null) {
-			return false;
-		}
-		
-		removeAll ();
-		loadFolder (newDir);
-		return true;
-	}
-	
-	private void loadFolder(DirectoryInfo dir) {
-		this.dir = dir;
-		dirs =  dir.GetDirectories();
-		files = dir.GetFiles();
-
-		startClusters = new GameObject[dirs.Length];
-		planets = new GameObject[files.Length];
-
-		origin = Vector3.zero;
-		sun =  createObject(dir.Name, sunPrefab, null, origin);
-		for (int i=0; i<startClusters.Length; i++) {
-			startClusters[i] = createObject(dirs[i].Name, starClusterPrefab, null, new Vector3(3f,0f,(i+1)*(-30f)));
-		}
-		for (int i=0; i<planets.Length; i++) {
-			// determine the material to be used
-			Material planetMat = null;
-			string[] extention = files[i].Name.Split(new Char[] {'.'});
-			switch (extention[extention.Length-1]) {
-			case "exe":
-				planetMat = executable;
-				break;
-			case "txt":
-				planetMat = text;
-				break;
-			case "cs":
-				planetMat = text;
-				break;
-			case "jpg":
-				planetMat = image;
-				break;
-			case "png":
-				planetMat = image;
-				break;
-			case "tga":
-				planetMat = image;
-				break;
-			case "avi":
-				planetMat = video;
-				break;
-			case "mp3":
-				planetMat = music;
-				break;
-			case "odf":
-				planetMat = document;
-				break;
-			case "doc":
-				planetMat = document;
-				break;
-			case "docx":
-				planetMat = document;
-				break;
-			case "obj":
-				planetMat = model3D;
-				break;
-			default:
-				planetMat = other;
-				break;
-			}
-
-			planets[i] = createObject(files[i].Name, planetPrefab, planetMat, new Vector3(0f,0f,(i+1)*(-20f)));
-
-			// set a random axis tilt
-			float randomAngleX = UnityEngine.Random.Range(-0.5f,0.5f);
-			float randomAngleZ = UnityEngine.Random.Range(-0.5f,0.5f);
-			Vector3 upVector = new Vector3(Mathf.Cos(randomAngleX),1.0f,Mathf.Cos (randomAngleZ));
-			planets[i].transform.FindChild("Planet").transform.rotation = Quaternion.LookRotation(Vector3.Cross(transform.up,upVector),upVector);
-
-			// set a random angular speed
-			float randomAngular = UnityEngine.Random.Range(-0.5f,0.5f);
-			planets[i].transform.FindChild("Planet").GetComponent<Rigidbody>().angularVelocity = randomAngular * upVector;
-		}
-
-		createObject (
-			"Asteroids",
-			asteroidBeltPrefab,
-			null,
-			new Vector3(0f, 2f, (Mathf.Max (dirs.Length, files.Length)+1)*(-20f)));
-	}
-	
-	private void removeAll() {
-		Destroy (sun);
-		foreach (GameObject startCluster in startClusters) {
-			Destroy (startCluster);
-		}
-		foreach (GameObject planet in planets) {
-			Destroy (planet);
-		}
-	}
-	
-	private GameObject createObject(String name, GameObject prefab, Material mat, Vector3 pos) {
-		GameObject currentFile = Instantiate(prefab, pos, Quaternion.identity) as GameObject;
-		
-		currentFile.name = name;
-		if (mat != null) {
-			Renderer rend = currentFile.GetComponent<Renderer> ();
-
-			if (rend == null)
-				rend = currentFile.transform.GetComponentInChildren<Renderer> ();
-
-			rend.material = mat;
-		}
-
-		Transform nameObject = currentFile.transform.Find("Name");
-		if (null != nameObject) {
-			nameObject.GetComponent<TextMesh> ().text = name;
-		} else {
-			Debug.Log ("No Text child for object " + name);
-		}
-
-		return currentFile;
-	}
-
-	public void DrawNames (float playerPosition) {
-		// find planets / star cluster whose name must be drawn
-
 	}
 
 	public void Selection() {
 		Collider selected = transform.Find ("/OVRPlayerController").GetComponent<UserController>().GetSelection();
-		// TODO displaz file or cd to folder
+		if (!canSelect || selected == null)
+			return;
 
-		if (canSelect && selected != null && selected.CompareTag ("File")) {
+		if (selected.CompareTag ("File")) {
 			canSelect = false;
 			string[] extention = selected.transform.parent.name.Split (new Char[] {'.'});
 			Debug.Log (extention [extention.Length - 1]);
@@ -218,33 +69,195 @@ public class PlanetController : MonoBehaviour {
 				StartCoroutine (DisplayFile (FileType.Other, selected.transform.parent));
 				break;
 			}
+		} else if (selected.CompareTag ("Folder")) {
+			canSelect = false;
+			if(systems[1] != null) {
+				systems[1].removeAll();
+				systems[1] = null;
+			}
+			changeSolarSystem(selected.gameObject, posInit);
 		}
 	}
+	
+	private bool changeSolarSystem(GameObject newSystem, Vector3 origin) {
+		DirectoryInfo newDir = null;
+		
+		if(newSystem == systems[0].sun) {
+			newDir = systems[0].dir.Parent;
+		} else {
+			for (int i=0; i<systems[0].startClusters.Length; i++) {
+				if(newSystem == systems[0].startClusters[i]) {
+					newDir = systems[0].dirs[i];
+					break;
+				}
+			}
+		}
+		if(newDir == null) {
+			return false;
+		}
 
+		systems [1] = systems [0];
+		systems[0] = new SolarSystem (this, newDir, origin);
+		return true;
+	}
+	
 	IEnumerator DisplayFile(FileType type, Transform file) {
 		switch (type) {
-		case FileType.Text:
-			for (int i = 0; i < 10; i++) {
-				file.Translate(new Vector3(0f,0.2f,0f));
-				yield return new WaitForSeconds(0.05f);
-			}
-			GameObject content = GameObject.Instantiate(
-				textfileContentPrefab, 
-				textfileContentPrefab.transform.position + new Vector3(0f,file.position.y + 0.5f,file.position.z),
-				Quaternion.identity) as GameObject;
-			content.GetComponent<TextMesh>().text = "TODO: get textfile content\nand use it to feed this\nGameObject, insering linefeeds\nif necessary.";
-			break;
-		case FileType.Other:
-			for (int i = 0; i < 5; i++) {
-				file.Translate(new Vector3(0f,0.1f,0f));
-				yield return new WaitForSeconds(0.01f);
-			}
-			for (int i = 0; i < 5; i++) {
-				file.Translate(new Vector3(0f,-0.1f,0f));
-				yield return new WaitForSeconds(0.01f);
-			}
-			break;
+			case FileType.Text:
+				for (int i = 0; i < 10; i++) {
+					file.Translate(new Vector3(0f,0.2f,0f));
+					yield return new WaitForSeconds(0.05f);
+				}
+				GameObject content = GameObject.Instantiate(
+					textfileContentPrefab, 
+					textfileContentPrefab.transform.position + new Vector3(0f,file.position.y + 0.5f,file.position.z),
+					Quaternion.identity) as GameObject;
+				content.GetComponent<TextMesh>().text = "TODO: get textfile content\nand use it to feed this\nGameObject, insering linefeeds\nif necessary.";
+				break;
+			case FileType.Other:
+				for (int i = 0; i < 5; i++) {
+					file.Translate(new Vector3(0f,0.1f,0f));
+					yield return new WaitForSeconds(0.01f);
+				}
+				for (int i = 0; i < 5; i++) {
+					file.Translate(new Vector3(0f,-0.1f,0f));
+					yield return new WaitForSeconds(0.01f);
+				}
+				break;
 		}
 		canSelect = true;
+	}
+	
+	
+	
+	private class SolarSystem {
+		public DirectoryInfo dir;
+		public DirectoryInfo[] dirs;
+		public FileInfo[] files;
+		
+		public GameObject sun;
+		public GameObject[] startClusters;
+		public GameObject[] planets;
+		
+		public Vector3 origin;
+		private PlanetController pc;
+		
+		public SolarSystem(PlanetController pc, DirectoryInfo dir, Vector3 origin) {
+			this.pc = pc;
+			this.origin = origin;
+			loadFolder(dir);
+		}
+		
+		public void setOrigin(Vector3 origin) {
+			sun.transform.position = sun.transform.position - this.origin + origin;
+			
+			foreach (GameObject startCluster in startClusters) {
+				startCluster.transform.position = startCluster.transform.position - this.origin + origin;
+			}
+			foreach (GameObject planet in planets) {
+				planet.transform.position = planet.transform.position - this.origin + origin;
+			}
+			
+			this.origin = origin;
+		}
+		
+		private void loadFolder(DirectoryInfo dir) {
+			this.dir = dir;
+			dirs =  dir.GetDirectories();
+			files = dir.GetFiles();
+			
+			startClusters = new GameObject[dirs.Length];
+			planets = new GameObject[files.Length];
+			
+			sun =  createObject(dir.Name, pc.sunPrefab, null, origin);
+			for (int i=0; i<startClusters.Length; i++) {
+				startClusters[i] = createObject(dirs[i].Name, pc.starClusterPrefab, null, origin + new Vector3(3f,0f,(i+1)*(-30f)));
+			}
+			for (int i=0; i<planets.Length; i++) {
+				string[] extention = files[i].Name.Split(new Char[] {'.'});
+				Material planetMat = getMaterialFromType(extention[extention.Length-1]);
+				planets[i] = createObject(files[i].Name, pc.planetPrefab, planetMat, origin + new Vector3(0f,0f,(i+1)*(-20f)));
+
+				// set a random axis tilt
+				float randomAngleX = UnityEngine.Random.Range(-0.5f,0.5f);
+				float randomAngleZ = UnityEngine.Random.Range(-0.5f,0.5f);
+				Vector3 upVector = new Vector3(Mathf.Cos(randomAngleX),1.0f,Mathf.Cos (randomAngleZ));
+				planets[i].transform.FindChild("Planet").transform.rotation = Quaternion.LookRotation(Vector3.Cross(pc.transform.up,upVector),upVector);
+
+				// set a random angular speed
+				float randomAngular = UnityEngine.Random.Range(-0.5f,0.5f);
+				planets[i].transform.FindChild("Planet").GetComponent<Rigidbody>().angularVelocity = randomAngular * upVector;
+			}
+			
+			createObject (
+				"Asteroids",
+				pc.asteroidBeltPrefab,
+				null,
+				new Vector3(0f, 2f, (Mathf.Max (dirs.Length, files.Length)+1)*(-20f)));
+		}
+		
+		public void removeAll() {
+			Destroy (sun);
+			foreach (GameObject startCluster in startClusters) {
+				Destroy (startCluster);
+			}
+			foreach (GameObject planet in planets) {
+				Destroy (planet);
+			}
+		}
+			
+		public void DrawNames (float playerPosition) {
+			// find planets / star cluster whose name must be drawn
+			
+		}
+		
+		private GameObject createObject(String name, GameObject prefab, Material mat, Vector3 pos) {
+			GameObject currentFile = Instantiate(prefab, pos, Quaternion.identity) as GameObject;
+			
+			currentFile.name = name;
+			if (mat != null) {
+				Renderer rend = currentFile.GetComponent<Renderer> ();
+				
+				if (rend == null)
+					rend = currentFile.transform.GetComponentInChildren<Renderer> ();
+				
+				rend.material = mat;
+			}
+			
+			Transform nameObject = currentFile.transform.Find("Name");
+			if (null != nameObject) {
+				nameObject.GetComponent<TextMesh> ().text = name;
+			} else {
+				Debug.Log ("No Text child for object " + name);
+			}
+			
+			return currentFile;
+		}
+		
+		private Material getMaterialFromType(String ext) {
+			switch (ext) {
+			case "exe":
+				return pc.executable;
+			case "txt":
+			case "cs":
+				return pc.text;
+			case "jpg":
+			case "png":
+			case "tga":
+				return pc.image;
+			case "avi":
+				return pc.video;
+			case "mp3":
+				return pc.music;
+			case "odf":
+			case "doc":
+			case "docx":
+				return pc.document;
+			case "obj":
+				return pc.model3D;
+			default:
+				return pc.other;
+			}
+		}
 	}
 }

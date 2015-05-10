@@ -20,6 +20,9 @@ public class PlanetController : MonoBehaviour {
 	public Material model3D;
 	public Material other;
 	public GameObject textfileContentPrefab;
+
+	public float planetWindowSize = 4f;
+	public float maxPlanetDiffPos = 0.5f;
 	
 	private bool canSelect = true;
 	private SolarSystem[] systems;
@@ -139,6 +142,7 @@ public class PlanetController : MonoBehaviour {
 		public GameObject sun;
 		public GameObject[] startClusters;
 		public GameObject[] planets;
+		public GameObject asteroids;
 		
 		public Vector3 origin;
 		private PlanetController pc;
@@ -158,6 +162,7 @@ public class PlanetController : MonoBehaviour {
 			foreach (GameObject planet in planets) {
 				planet.transform.position = planet.transform.position - this.origin + origin;
 			}
+			asteroids.transform.position = asteroids.transform.position - this.origin + origin;
 			
 			this.origin = origin;
 		}
@@ -171,13 +176,15 @@ public class PlanetController : MonoBehaviour {
 			planets = new GameObject[files.Length];
 			
 			sun =  createObject(dir.Name, pc.sunPrefab, null, origin);
-			for (int i=0; i<startClusters.Length; i++) {
-				startClusters[i] = createObject(dirs[i].Name, pc.starClusterPrefab, null, origin + new Vector3(3f,0f,(i+1)*(-30f)));
-			}
+
+			float lastDiff = 0f;
 			for (int i=0; i<planets.Length; i++) {
 				string[] extention = files[i].Name.Split(new Char[] {'.'});
 				Material planetMat = getMaterialFromType(extention[extention.Length-1]);
-				planets[i] = createObject(files[i].Name, pc.planetPrefab, planetMat, origin + new Vector3(0f,0f,(i+1)*(-20f)));
+				float min = Mathf.Max(lastDiff-pc.maxPlanetDiffPos, -pc.planetWindowSize);
+				float max = Mathf.Min (lastDiff+pc.maxPlanetDiffPos, pc.planetWindowSize);
+				lastDiff = UnityEngine.Random.Range(min, max);
+				planets[i] = createObject(files[i].Name, pc.planetPrefab, planetMat, origin + new Vector3(lastDiff,0f,(i+1)*(-20f)));
 
 				// set a random axis tilt
 				float randomAngleX = UnityEngine.Random.Range(-0.5f,0.5f);
@@ -189,11 +196,21 @@ public class PlanetController : MonoBehaviour {
 				float randomAngular = UnityEngine.Random.Range(-0.5f,0.5f);
 				planets[i].transform.FindChild("Planet").GetComponent<Rigidbody>().angularVelocity = randomAngular * upVector;
 			}
+
+			for (int i=0; i<startClusters.Length; i++) {
+				float shift;
+				if(i < planets.Length) {
+					shift = planets[i].transform.position.x + UnityEngine.Random.Range(0, pc.maxPlanetDiffPos);
+				} else {
+					float min = Mathf.Max(lastDiff-pc.maxPlanetDiffPos, -pc.planetWindowSize);
+					float max = Mathf.Min (lastDiff+pc.maxPlanetDiffPos, pc.planetWindowSize);
+					lastDiff = UnityEngine.Random.Range(min, max);
+					shift = lastDiff;
+				}
+				startClusters[i] = createObject(dirs[i].Name, pc.starClusterPrefab, null, origin + new Vector3(shift,0f,10f+(i+1)*(-20f)));
+			}
 			
-			createObject (
-				"Asteroids",
-				pc.asteroidBeltPrefab,
-				null,
+			asteroids = createObject ("Asteroids", pc.asteroidBeltPrefab, null,
 				new Vector3(0f, 2f, (Mathf.Max (dirs.Length, files.Length)+1)*(-20f)));
 		}
 		
@@ -205,6 +222,7 @@ public class PlanetController : MonoBehaviour {
 			foreach (GameObject planet in planets) {
 				Destroy (planet);
 			}
+			Destroy (asteroids);
 		}
 			
 		public void DrawNames (float playerPosition) {

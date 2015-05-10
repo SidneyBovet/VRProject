@@ -25,6 +25,7 @@ public class PlanetController : MonoBehaviour {
 	public float maxPlanetDiffPos = 0.5f;
 	
 	private bool canSelect = true;
+	private bool fileSelected = false;
 	private SolarSystem[] systems;
 	private Vector3 posInit = new Vector3(1000f, 0f, 0f);
 	private enum FileType {
@@ -49,8 +50,9 @@ public class PlanetController : MonoBehaviour {
 			Vector3 move = Vector3.Lerp(Vector3.zero, systems [0].origin, speed*0.1f);
 			systems [0].setOrigin (systems [0].origin - move);
 			systems [1].setOrigin (systems [1].origin - move);
-		} else {
-			canSelect = true;
+			if (systems [0].origin.magnitude < 0.1f) {
+				canSelect = true;
+			}
 		}
 	}
 
@@ -58,23 +60,23 @@ public class PlanetController : MonoBehaviour {
 		Collider selected = transform.Find ("/OVRPlayerController").GetComponent<UserController>().GetSelection();
 		if (!canSelect || selected == null)
 			return;
+		
+		canSelect = false;
 
 		if (selected.CompareTag ("File")) {
-			canSelect = false;
+			// actually select a file
 			string[] extention = selected.transform.parent.name.Split (new Char[] {'.'});
-			Debug.Log (extention [extention.Length - 1]);
 			switch (extention [extention.Length - 1]) {
 			case "txt":
-				Debug.Log ("TextFile selected!");
 				StartCoroutine (DisplayFile (FileType.Text, selected.transform.parent));
 				break;
 			default:
-				Debug.Log ("Unknown filetype selected!");
 				StartCoroutine (DisplayFile (FileType.Other, selected.transform.parent));
 				break;
 			}
+			fileSelected = !fileSelected;
 		} else if (selected.CompareTag ("Folder")) {
-			canSelect = false;
+			// double-click on a folder
 			if(systems[1] != null) {
 				systems[1].removeAll();
 				systems[1] = null;
@@ -107,27 +109,57 @@ public class PlanetController : MonoBehaviour {
 	
 	IEnumerator DisplayFile(FileType type, Transform file) {
 		switch (type) {
-			case FileType.Text:
+		case FileType.Text:
+			if (!fileSelected) {
+				// move the selected planet upwards
 				for (int i = 0; i < 10; i++) {
-					file.Translate(new Vector3(0f,0.2f,0f));
+					file.Translate(new Vector3(0f, 0.2f, 0f));
 					yield return new WaitForSeconds(0.05f);
 				}
+
+				// create the 3DText of the content
 				GameObject content = GameObject.Instantiate(
-					textfileContentPrefab, 
+					textfileContentPrefab,
 					textfileContentPrefab.transform.position + new Vector3(0f,file.position.y + 0.5f,file.position.z),
 					Quaternion.identity) as GameObject;
-				content.GetComponent<TextMesh>().text = "TODO: get textfile content\nand use it to feed this\nGameObject, insering linefeeds\nif necessary.";
-				break;
-			case FileType.Other:
-				for (int i = 0; i < 5; i++) {
-					file.Translate(new Vector3(0f,0.1f,0f));
-					yield return new WaitForSeconds(0.01f);
+				content.transform.parent = file;
+
+				// find the file's index in the array
+				int index = 0;
+				for (int i = 0; i < systems[0].files.Length; i++) {
+					if (systems[0].files[i].Name.Equals(file.name)) {
+						index = i;
+						break;
+					}
 				}
-				for (int i = 0; i < 5; i++) {
-					file.Translate(new Vector3(0f,-0.1f,0f));
-					yield return new WaitForSeconds(0.01f);
+				
+				// fill in the content
+				StreamReader fs = new StreamReader(systems[0].files[index].FullName);
+				string line;
+				string textContent = "";
+				while((line = fs.ReadLine()) != null) {
+					textContent += line + "\n";
 				}
-				break;
+				content.GetComponent<TextMesh>().text = textContent;
+			} else {
+				Destroy(file.FindChild("TextfileContent(Clone)").gameObject);
+
+				for (int i = 0; i < 10; i++) {
+					file.Translate(new Vector3(0f, -0.2f, 0f));
+					yield return new WaitForSeconds(0.05f);
+				}
+			}
+			break;
+		case FileType.Other:
+			for (int i = 0; i < 5; i++) {
+				file.Translate(new Vector3(0f,0.1f,0f));
+				yield return new WaitForSeconds(0.01f);
+			}
+			for (int i = 0; i < 5; i++) {
+				file.Translate(new Vector3(0f,-0.1f,0f));
+				yield return new WaitForSeconds(0.01f);
+			}
+			break;
 		}
 		canSelect = true;
 	}

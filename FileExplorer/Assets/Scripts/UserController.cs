@@ -8,12 +8,18 @@ public class UserController : MonoBehaviour {
 	private bool m_canMove = true;
 	private float m_moveSensitivity = 150000.0f;
 	private Collider m_selection = null;
+	private Vector3 defaultPos;
+
+	void Start() {
+		defaultPos = transform.position;
+	}
 
 	void Update () {
 		Transform forward = transform.FindChild ("OVRCameraRig/TrackingSpace/CenterEyeAnchor");
 		RaycastHit hit;
 		Ray lookRay = new Ray (transform.position,forward.forward);
 
+		// Select the planet that the plazer is looking at
 		if (Physics.Raycast(lookRay, out hit, 1000.0f) && m_selection != hit.collider) {
 			if (hit.collider.CompareTag("File") || hit.collider.CompareTag("Folder")) {
 				((Behaviour)(hit.collider.GetComponent("Halo"))).enabled = true;
@@ -22,8 +28,14 @@ public class UserController : MonoBehaviour {
 				m_selection = hit.collider;
 			}
 		}
+		
+		if (Input.GetKeyDown (KeyCode.R)) {
+			transform.position = defaultPos;
+			GetComponent<Rigidbody>().velocity = Vector3.zero;
+		}
 	}
 
+	// move the player of distance. This is typically user to scroll along the list of files inside a folder
 	public void Move (float distance) {
 		if (m_canMove) {
 			if (Mathf.Abs(distance) > stopThreshold) {

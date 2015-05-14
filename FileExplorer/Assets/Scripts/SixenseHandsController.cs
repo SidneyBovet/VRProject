@@ -23,7 +23,7 @@ public class SixenseHandsController : MonoBehaviour {
 			m_camera.Move (0.2f);
 		else if (Input.GetKey (KeyCode.Space))
 			m_camera.Move (0.0f);
-		else if (Input.GetKey (KeyCode.Return))
+		else if (Input.GetKeyDown (KeyCode.Return))
 			transform.Find("/controller").GetComponent<PlanetController>().Selection();
 		// END DEBUG
 
